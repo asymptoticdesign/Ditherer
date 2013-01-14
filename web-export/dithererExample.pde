@@ -1,3 +1,46 @@
+Ditherer img;
+int gridSize = 5;
+
+void setup() {
+  img = new Ditherer("data/teatime.jpg");
+  int[] imgSize = img.getSize();
+  //uncomment to automaticaly determine window size
+  //size(imgSize[0],imgSize[1]);
+  size(512,384);
+  background(255);
+  PFont.list();
+  img.showImage();
+}
+
+void draw() {
+}
+
+void keyPressed() {
+  if(key == '0') {
+    img.showImage();
+  }
+  if (key == '1') {
+    img.halftone(gridSize);
+  }
+  if (key == '2') {
+    img.maze(gridSize);
+    saveFrame("maze.jpg");
+  }
+  if (key == '3') {
+    img.digits(gridSize);
+  }
+  if(key == '4') {
+    img.charactersUpper(gridSize);
+  }
+  if (key == CODED) {
+    if (keyCode == UP) {
+      gridSize++;
+    }
+    if (keyCode == DOWN) {
+      gridSize--;
+    }
+  }
+}
 //  Title: Ditherer
 //  Description: A class that manages various image dithering techniques.
 
@@ -130,36 +173,6 @@ class Ditherer {
       }
     }
   }
-  
-  void packCircles(float maxRadius) {
-    //need to reorganize
-    Circle[] circleList = new Circle[1];
-    boolean validRadius = false;
-    if(circleList.length
-    while(validRadius == false) {
-      float x = random(width);
-      float y = random(height);
-      Circle tempCircle = new Circle(x,y,map(brightness(this.targetImage.pixels[int(y)*width + int(x)]),0,255,0,maxRadius));
-      for(int i = 0; i < circleList.length; i++) {
-        float distance = dist(tempCircle.x,tempCircle.y,circleList[i].x,circleList[i].y);
-        if(distance < circleList[i].rad) {
-          //we are inside of another circle!
-          //try again
-          break;
-        }
-      }
-       
-      for(int i = 0; i < circleList.length; i++) {
-        float distance = dist(tempCircle.x, tempCircle.y, circleList[i].x, circleList[i].y);
-        if(distance < circleList[i].rad + tempCircle.rad) {
-        //nothing happens
-        }
-        else {
-          tempCircle.rad = distance - circleList[i].rad;
-        }
-      }
-      ellipse(tempCircle.x,tempCircle.y,tempCircle.rad,tempCircle.rad);
-    }
-  }
 }
+
 
