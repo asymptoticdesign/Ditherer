@@ -102,7 +102,7 @@ class Ditherer {
     fill(0);
     noStroke();
     //this works best with large files, otherwise the text is too small to read
-    PFont font = createFont("mono", gridSize,true);
+    PFont font = createFont("mono", gridSize, true);
     textFont(font);
     //varies circle size proportional to pixel brightness
     for (int i = 0; i < width; i+=gridSize) {
@@ -113,13 +113,13 @@ class Ditherer {
       }
     }
   }
-  
+
   void charactersUpper(int gridSize) {
     background(255);
     fill(0);
     noStroke();
     //this works best with large files, otherwise the text is too small to read
-    PFont font = createFont("mono", gridSize,true);
+    PFont font = createFont("mono", gridSize, true);
     textFont(font);
     //varies circle size proportional to pixel brightness
     for (int i = 0; i < width; i+=gridSize) {
@@ -130,36 +130,58 @@ class Ditherer {
       }
     }
   }
-  
-  void packCircles(float maxRadius) {
+
+  void packCircles(int numCircles, float minRadius, float maxRadius) {
+    background(255);
+    noStroke();
+    fill(0);
     //need to reorganize
-    Circle[] circleList = new Circle[1];
+    ArrayList<Circle> circleList = new ArrayList<Circle>();
+    float x = 0;
+    float y = 0;
+    float rad = 0;
     boolean validRadius = false;
-    if(circleList.length
-    while(validRadius == false) {
-      float x = random(width);
-      float y = random(height);
-      Circle tempCircle = new Circle(x,y,map(brightness(this.targetImage.pixels[int(y)*width + int(x)]),0,255,0,maxRadius));
-      for(int i = 0; i < circleList.length; i++) {
-        float distance = dist(tempCircle.x,tempCircle.y,circleList[i].x,circleList[i].y);
-        if(distance < circleList[i].rad) {
-          //we are inside of another circle!
-          //try again
-          break;
+    boolean validCenter = false;
+
+    while (circleList.size () < numCircles) {
+      validRadius = false;
+      validCenter = false;
+
+      while (validCenter == false) {
+        //set to true -- if the center is not valid, this gets changed.  if it passes all tests, this goes through the for loop untouched.
+        validCenter = true;
+        //pick a random position
+        x = random(width);
+        y = random(height);
+        rad = map(brightness(this.targetImage.pixels[(int)y*width+(int)x]), 0, 255.0, minRadius, maxRadius);
+        //make circle object
+        //check if it is inside any other circle
+        for (int i = 0; i < circleList.size(); i++) {
+          Circle compareWith = (Circle) circleList.get(i);
+          float distance = dist(x, y, compareWith.x, compareWith.y);
+          if (distance < compareWith.rad) {
+            //if this circle is too close
+            validCenter = false;
+          }
         }
       }
-       
-      for(int i = 0; i < circleList.length; i++) {
-        float distance = dist(tempCircle.x, tempCircle.y, circleList[i].x, circleList[i].y);
-        if(distance < circleList[i].rad + tempCircle.rad) {
-        //nothing happens
+
+//      while (validRadius == false) {
+//        validRadius = true;
+        //now check radii
+        for (int i = 0; i < circleList.size(); i++) {
+          Circle compareWith = (Circle) circleList.get(i);
+          float distance = dist(x, y, compareWith.x, compareWith.y);
+          if (distance < compareWith.rad + rad) {
+            //radii overlap
+            rad = distance - compareWith.rad;
+          }
         }
-        else {
-          tempCircle.rad = distance - circleList[i].rad;
-        }
-      }
-      ellipse(tempCircle.x,tempCircle.y,tempCircle.rad,tempCircle.rad);
-    }
+        circleList.add(new Circle(x, y, rad));
+      //}
+      Circle currentCircle = (Circle) circleList.get(circleList.size() - 1);
+      ellipse(currentCircle.x, currentCircle.y, 2*currentCircle.rad, 2*currentCircle.rad);
+//      validRadius = false;
+   }
   }
 }
-
